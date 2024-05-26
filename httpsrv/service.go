@@ -17,11 +17,9 @@
 package httpsrv
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/vitorreao/wallet-go/httperr"
 )
 
 type Service interface {
@@ -30,7 +28,7 @@ type Service interface {
 
 type service struct {
   prefix string
-  handlers []Handler
+  handlers []handler
 }
 
 func (s *service) Register(r gin.IRouter) {
@@ -40,13 +38,4 @@ func (s *service) Register(r gin.IRouter) {
   }
 }
 
-func wrapH(f HandlerFunc) func (c *gin.Context) {
-  return func (c *gin.Context) {
-    // TODO: get context from gin context
-    ctx := context.Background()
-    err := f(ctx, Request{})
-    herr := httperr.FromError(err)
-    c.JSON(herr.Code(), herr.Error())
-  }
-}
 

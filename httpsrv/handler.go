@@ -18,7 +18,7 @@ package httpsrv
 
 import "context"
 
-type Handler struct {
+type handler struct {
   Method string
   Path string
   Func HandlerFunc

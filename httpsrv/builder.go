@@ -23,11 +23,11 @@ import (
 
 type Builder struct {
   prefix string
-  handlers map[string]Handler
+  handlers map[string]handler
 }
 
 func (b *Builder) Build() Service {
-  handlers := []Handler{}
+  handlers := []handler{}
   for _, handler := range b.handlers {
     handlers = append(handlers, handler)
   }
@@ -62,9 +62,9 @@ func (b *Builder) WithHandle(
     return b
   }
   if b.handlers == nil {
-    b.handlers = map[string]Handler{}
+    b.handlers = map[string]handler{}
   }
-  b.handlers[handlerKey(httpMethod, path)] = Handler{
+  b.handlers[handlerKey(httpMethod, path)] = handler{
     Method: httpMethod,
     Path: path,
     Func: f,

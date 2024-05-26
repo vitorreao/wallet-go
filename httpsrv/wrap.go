@@ -14,14 +14,21 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package user
+package httpsrv
 
-import "github.com/vitorreao/wallet-go/httpsrv"
+import (
+	"context"
+	"github.com/vitorreao/wallet-go/httperr"
+	"github.com/gin-gonic/gin"
+)
 
-func NewService(handler Handler) httpsrv.Service {
-  b := httpsrv.Builder{}
-  b.WithPrefix("users")
-  b.WithPost("", handler.CreateUser)
-  return b.Build()
+func wrapH(f HandlerFunc) func (c *gin.Context) {
+  return func (c *gin.Context) {
+    // TODO: get context from gin context
+    ctx := context.Background()
+    err := f(ctx, Request{})
+    herr := httperr.FromError(err)
+    c.JSON(herr.Code(), herr.Error())
+  }
 }
 
