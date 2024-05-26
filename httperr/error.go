@@ -14,14 +14,45 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package user
+package httperr
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"net/http"
 )
 
-func AddRoutes(r gin.IRouter, handler Handler) {
-  g := r.Group("/users")
-  g.GET("/", handler.CreateUser)
+type HTTPError interface {
+  error
+  Code() int
+}
+
+type httpError struct {
+  code int
+  msg string
+}
+
+func (e *httpError) Error() string {
+  return fmt.Sprintf("(HTTP %d) %s", e.code, e.msg)
+}
+
+func (e *httpError) Code() int {
+  return e.code
+}
+
+func FromError(err error) HTTPError {
+  if httpErr, ok := err.(*httpError); ok {
+    return httpErr
+  }
+  return &httpError{
+    code: http.StatusInternalServerError,
+    msg: err.Error(),
+  }
+}
+
+func NewNotImplemented(msg string) error {
+  return &httpError{
+    code: http.StatusNotImplemented,
+    msg: msg,
+  }
 }
 

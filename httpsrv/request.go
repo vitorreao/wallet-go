@@ -14,26 +14,11 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package user
+package httpsrv
 
-import (
-	"context"
+import "io"
 
-	"github.com/vitorreao/wallet-go/httperr"
-	"github.com/vitorreao/wallet-go/httpsrv"
-)
-
-type Handler interface {
-  CreateUser(ctx context.Context, req httpsrv.Request) error
-}
-
-type handler struct {}
-
-func NewHandler() Handler {
-  return &handler{}
-}
-
-func (h *handler) CreateUser(ctx context.Context, req httpsrv.Request) error {
-  return httperr.NewNotImplemented("Create user is not available yet")
+type Request struct {
+  Body io.Reader
 }
 

@@ -14,26 +14,39 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package user
+package httpsrv
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/vitorreao/wallet-go/httperr"
-	"github.com/vitorreao/wallet-go/httpsrv"
 )
 
-type Handler interface {
-  CreateUser(ctx context.Context, req httpsrv.Request) error
+type Service interface {
+  Register(r gin.IRouter)
 }
 
-type handler struct {}
-
-func NewHandler() Handler {
-  return &handler{}
+type service struct {
+  prefix string
+  handlers []Handler
 }
 
-func (h *handler) CreateUser(ctx context.Context, req httpsrv.Request) error {
-  return httperr.NewNotImplemented("Create user is not available yet")
+func (s *service) Register(r gin.IRouter) {
+  g := r.Group(fmt.Sprintf("/%s", s.prefix))
+  for _, h := range s.handlers {
+    g.Handle(h.Method, h.Path, wrapH(h.Func))
+  }
+}
+
+func wrapH(f HandlerFunc) func (c *gin.Context) {
+  return func (c *gin.Context) {
+    // TODO: get context from gin context
+    ctx := context.Background()
+    err := f(ctx, Request{})
+    herr := httperr.FromError(err)
+    c.JSON(herr.Code(), herr.Error())
+  }
 }
 

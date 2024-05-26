@@ -18,6 +18,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/vitorreao/wallet-go/httpsrv"
 	"github.com/vitorreao/wallet-go/user"
 	"go.uber.org/fx"
 )
@@ -32,11 +33,22 @@ func NewApiGroup(e *gin.Engine) gin.IRouter {
   return e.Group("/api")
 }
 
+type RouteParams struct {
+  fx.In
+  Router gin.IRouter
+  Services []httpsrv.Service `group:"services"`
+}
+
 func main() {
   fx.New(
     fx.Provide(NewGinEngine),
     fx.Provide(NewApiGroup),
     user.Module,
+    fx.Invoke(func (params RouteParams) {
+      for _, srv := range params.Services {
+        srv.Register(params.Router)
+      }
+    }),
     fx.Invoke(func(en *gin.Engine) {
       en.Run()
     }),

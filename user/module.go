@@ -17,15 +17,16 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
 )
 
 var Module = fx.Module("users",
   fx.Provide(
     NewHandler,
+    fx.Annotate(
+      NewService,
+      fx.ResultTags(`group:"services"`),
+    ),
   ),
-  fx.Invoke(func (e gin.IRouter, h Handler) {
-    AddRoutes(e, h)
-  }),
 )
+

@@ -16,24 +16,7 @@
 
 package user
 
-import (
-	"context"
-
-	"github.com/vitorreao/wallet-go/httperr"
-	"github.com/vitorreao/wallet-go/httpsrv"
-)
-
-type Handler interface {
-  CreateUser(ctx context.Context, req httpsrv.Request) error
-}
-
-type handler struct {}
-
-func NewHandler() Handler {
-  return &handler{}
-}
-
-func (h *handler) CreateUser(ctx context.Context, req httpsrv.Request) error {
-  return httperr.NewNotImplemented("Create user is not available yet")
+func validateCreateUserReq(req *CreateUserRequest) error {
+  return nil
 }
 
