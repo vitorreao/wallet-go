@@ -19,9 +19,8 @@ package user
 import "github.com/vitorreao/wallet-go/httpsrv"
 
 func NewService(handler Handler) httpsrv.Service {
-  b := httpsrv.Builder{}
-  b.WithPrefix("users")
-  b.WithPost("", handler.CreateUser)
-  return b.Build()
+  return httpsrv.NewService("users",
+    httpsrv.WithPost("", handler.CreateUser),
+  )
 }
 

@@ -24,7 +24,10 @@ import (
 )
 
 type Handler interface {
-  CreateUser(ctx context.Context, req httpsrv.Request) error
+  CreateUser(
+    ctx context.Context,
+    req *httpsrv.Request[CreateUserRequest],
+  ) (*httpsrv.Response[CreateUserResponse], error)
 }
 
 type handler struct {}
@@ -33,7 +36,10 @@ func NewHandler() Handler {
   return &handler{}
 }
 
-func (h *handler) CreateUser(ctx context.Context, req httpsrv.Request) error {
-  return httperr.NewNotImplemented("Create user is not available yet")
+func (h *handler) CreateUser(
+  ctx context.Context,
+  req *httpsrv.Request[CreateUserRequest],
+) (*httpsrv.Response[CreateUserResponse], error) {
+  return nil, httperr.NewNotImplemented("Create user is not available yet")
 }
 

@@ -26,16 +26,17 @@ type Service interface {
   Register(r gin.IRouter)
 }
 
+type Option func (g *gin.RouterGroup)
+
 type service struct {
   prefix string
-  handlers []handler
+  opts []Option
 }
 
 func (s *service) Register(r gin.IRouter) {
   g := r.Group(fmt.Sprintf("/%s", s.prefix))
-  for _, h := range s.handlers {
-    g.Handle(h.Method, h.Path, wrapH(h.Func))
+  for _, opt := range s.opts {
+    opt(g)
   }
 }
-
 

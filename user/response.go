@@ -14,21 +14,9 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package httpsrv
+package user
 
-import (
-	"context"
-	"github.com/vitorreao/wallet-go/httperr"
-	"github.com/gin-gonic/gin"
-)
+type CreateUserResponse struct {
 
-func wrapH(f HandlerFunc) func (c *gin.Context) {
-  return func (c *gin.Context) {
-    // TODO: get context from gin context
-    ctx := context.Background()
-    err := f(ctx, Request{})
-    herr := httperr.FromError(err)
-    c.JSON(herr.Code(), herr.Error())
-  }
 }
 

@@ -16,10 +16,9 @@
 
 package httpsrv
 
-import "context"
-
-type HandlerFunc[TReq any, TRes any] func (
-  c context.Context,
-  req *Request[TReq],
-) (*Response[TRes], error)
+type Response[T any] struct {
+  Headers map[string]string
+  Code int
+  Data T
+}
 

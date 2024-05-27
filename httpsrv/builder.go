@@ -17,62 +17,56 @@
 package httpsrv
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/vitorreao/wallet-go/httperr"
 )
 
-type Builder struct {
-  prefix string
-  handlers map[string]handler
-}
-
-func (b *Builder) Build() Service {
-  handlers := []handler{}
-  for _, handler := range b.handlers {
-    handlers = append(handlers, handler)
-  }
+func NewService(prefix string, opts ...Option) Service {
   return &service{
-    prefix: b.prefix,
-    handlers: handlers,
+    prefix: prefix,
+    opts: opts,
   }
 }
 
-func (b *Builder) WithPrefix(prefix string) *Builder {
-  if b == nil {
-    return nil
-  }
-  b.prefix = prefix
-  return b
-}
-
-func (b *Builder) WithGet(path string, f HandlerFunc) *Builder {
-  return b.WithHandle(http.MethodGet, path, f)
-}
-
-func (b *Builder) WithPost(path string, f HandlerFunc) *Builder {
-  return b.WithHandle(http.MethodPost, path, f)
-}
-
-func (b *Builder) WithHandle(
-  httpMethod string,
+func WithPost[TReq any, TRes any](
   path string,
-  f HandlerFunc,
-) *Builder {
-  if b == nil {
-    return b
-  }
-  if b.handlers == nil {
-    b.handlers = map[string]handler{}
-  }
-  b.handlers[handlerKey(httpMethod, path)] = handler{
-    Method: httpMethod,
-    Path: path,
-    Func: f,
-  }
-  return b
+  hf HandlerFunc[TReq, TRes],
+) Option {
+  return withHandler(http.MethodPost, path, hf)
 }
 
-func handlerKey(httpMethod, path string) string {
-  return fmt.Sprintf("%s:%s", httpMethod, path)
+func withHandler[TReq any, TRes any](
+  method string,
+  path string,
+  hf HandlerFunc[TReq, TRes],
+) Option {
+  return func (g *gin.RouterGroup) {
+    g.Handle(method, path, func(c *gin.Context) {
+      // TODO: get context from gin context
+      ctx := context.Background()
+      req := Request[TReq]{}
+      if err := c.ShouldBindJSON(&req.Body); err != nil {
+        c.JSON(http.StatusBadRequest,
+          fmt.Sprintf("Error deserializing request body: %s", err.Error()))
+        return
+      }
+      res, err := hf(ctx, &req)
+      herr := httperr.FromError(err)
+      fmt.Println("PASSED HERE")
+      if herr != nil {
+        c.JSON(herr.Code(), herr.Error())
+        return
+      }
+      if res == nil {
+        c.Status(http.StatusOK)
+        return
+      }
+      c.JSON(res.Code, &res.Data)
+    })
+  }
 }
 

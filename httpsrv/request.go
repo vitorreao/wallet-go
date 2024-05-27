@@ -16,9 +16,7 @@
 
 package httpsrv
 
-import "io"
-
-type Request struct {
-  Body io.Reader
+type Request[T any] struct {
+  Body T
 }
 
