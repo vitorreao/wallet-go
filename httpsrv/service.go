@@ -17,9 +17,12 @@
 package httpsrv
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/vitorreao/wallet-go/httperr"
 )
 
 type Service interface {
@@ -37,6 +40,51 @@ func (s *service) Register(r gin.IRouter) {
   g := r.Group(fmt.Sprintf("/%s", s.prefix))
   for _, opt := range s.opts {
     opt(g)
+  }
+}
+
+func NewService(prefix string, opts ...Option) Service {
+  return &service{
+    prefix: prefix,
+    opts: opts,
+  }
+}
+
+func WithPost[TReq any, TRes any](
+  path string,
+  hf HandlerFunc[TReq, TRes],
+) Option {
+  return withHandler(http.MethodPost, path, hf)
+}
+
+func withHandler[TReq any, TRes any](
+  method string,
+  path string,
+  hf HandlerFunc[TReq, TRes],
+) Option {
+  return func (g *gin.RouterGroup) {
+    g.Handle(method, path, func(c *gin.Context) {
+      // TODO: get context from gin context
+      ctx := context.Background()
+      req := Request[TReq]{}
+      if err := c.ShouldBindJSON(&req.Body); err != nil {
+        c.JSON(http.StatusBadRequest,
+          fmt.Sprintf("Error deserializing request body: %s", err.Error()))
+        return
+      }
+      res, err := hf(ctx, &req)
+      herr := httperr.FromError(err)
+      fmt.Println("PASSED HERE")
+      if herr != nil {
+        c.JSON(herr.Code(), herr.Error())
+        return
+      }
+      if res == nil {
+        c.Status(http.StatusOK)
+        return
+      }
+      c.JSON(res.Code, &res.Data)
+    })
   }
 }
 
