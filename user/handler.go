@@ -40,6 +40,9 @@ func (h *handler) CreateUser(
   ctx context.Context,
   req *httpsrv.Request[CreateUserRequest],
 ) (*httpsrv.Response[CreateUserResponse], error) {
+  if err := validateCreateUserReq(&req.Body); err != nil {
+    return nil, err
+  }
   return nil, httperr.NewNotImplemented("Create user is not available yet")
 }
 

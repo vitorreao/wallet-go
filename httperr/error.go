@@ -49,6 +49,13 @@ func FromError(err error) HTTPError {
   }
 }
 
+func NewBadRequest(msg string) error {
+  return &httpError{
+    code: http.StatusBadRequest,
+    msg: msg,
+  }
+}
+
 func NewNotImplemented(msg string) error {
   return &httpError{
     code: http.StatusNotImplemented,
