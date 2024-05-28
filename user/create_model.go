@@ -1,3 +1,4 @@
+
 /*  Copyright (C) 2024 Vitor de Albuquerque Torreao
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -16,9 +17,11 @@
 
 package user
 
-type CreateUserRequest struct {
-  Username string `json:"username"`
-  Password string `json:"password"`
-  PhoneNum string `json:"phone"`
+type UserRegistration struct {
+  ID int64
+  Username string
+  HashedPassword string
+  Phone string
+  ValidationCode string
 }
 
