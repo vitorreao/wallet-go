@@ -17,17 +17,31 @@
 package user
 
 import (
-	"go.uber.org/fx"
+	"context"
+
+	"github.com/vitorreao/wallet-go/httperr"
 )
 
-var Module = fx.Module("users",
-  fx.Provide(
-    NewController,
-    NewHandler,
-    fx.Annotate(
-      NewService,
-      fx.ResultTags(`group:"services"`),
-    ),
-  ),
-)
+type Controller interface {
+  // CreateUserRegistration adds a new registration to the database. This
+  // registration represents an intent to register a new user. A User account
+  // is only actually created when the user confirms the registration afterwards.
+  CreateUserRegistration(
+    ctx context.Context,
+    req CreateUserRequest,
+  ) (*CreateUserResponse, error)
+}
+
+type controller struct {}
+
+func NewController() Controller {
+  return &controller{}
+}
+
+func (c *controller) CreateUserRegistration(
+  ctx context.Context,
+  req CreateUserRequest,
+) (*CreateUserResponse, error) {
+  return nil, httperr.NewNotImplemented("CreateUserRegistration is not implemented yet")
+}
 

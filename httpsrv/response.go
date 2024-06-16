@@ -19,6 +19,6 @@ package httpsrv
 type Response[T any] struct {
   Headers map[string]string
   Code int
-  Data T
+  Data *T
 }
 

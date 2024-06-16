@@ -74,7 +74,6 @@ func withHandler[TReq any, TRes any](
       }
       res, err := hf(ctx, &req)
       herr := httperr.FromError(err)
-      fmt.Println("PASSED HERE")
       if herr != nil {
         c.JSON(herr.Code(), herr.Error())
         return
@@ -83,7 +82,7 @@ func withHandler[TReq any, TRes any](
         c.Status(http.StatusOK)
         return
       }
-      c.JSON(res.Code, &res.Data)
+      c.JSON(res.Code, res.Data)
     })
   }
 }

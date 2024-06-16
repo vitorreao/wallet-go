@@ -1,4 +1,3 @@
-
 /*  Copyright (C) 2024 Vitor de Albuquerque Torreao
  *
  *  This program is free software: you can redistribute it and/or modify

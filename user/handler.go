@@ -18,8 +18,8 @@ package user
 
 import (
 	"context"
+	"net/http"
 
-	"github.com/vitorreao/wallet-go/httperr"
 	"github.com/vitorreao/wallet-go/httpsrv"
 )
 
@@ -30,10 +30,14 @@ type Handler interface {
   ) (*httpsrv.Response[CreateUserResponse], error)
 }
 
-type handler struct {}
+type handler struct {
+  controller Controller
+}
 
-func NewHandler() Handler {
-  return &handler{}
+func NewHandler(controller Controller) Handler {
+  return &handler{
+    controller: controller,
+  }
 }
 
 func (h *handler) CreateUser(
@@ -43,6 +47,14 @@ func (h *handler) CreateUser(
   if err := validateCreateUserReq(&req.Body); err != nil {
     return nil, err
   }
-  return nil, httperr.NewNotImplemented("Create user is not available yet")
+  registration, err := h.controller.CreateUserRegistration(ctx, req.Body)
+  if err != nil {
+    return nil, err
+  }
+  return &httpsrv.Response[CreateUserResponse]{
+    Headers: map[string]string{},
+    Code: http.StatusOK,
+    Data: registration,
+  }, nil
 }
 

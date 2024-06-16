@@ -17,6 +17,7 @@
 package user
 
 type CreateUserResponse struct {
-
+  Username string `json:"username"`
+  MaskedPhone string `json:"phone"`
 }
 
